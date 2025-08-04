@@ -1,0 +1,56 @@
+graph LR
+    subgraph "💰 Revenue Sources"
+        A[🎨 NFT Primary Sale<br/>Sale Price: 1 ETH]
+        B[🔄 NFT Secondary Sale<br/>Royalty: 2.5%]
+        C[📄 License Purchase<br/>Commercial Use]
+        D[🏠 Content Rental<br/>Time-based Access]
+    end
+    
+    subgraph "💸 Payment Distribution"
+        E[📊 Smart Contract<br/>Automatic Split]
+        F[🏦 Creator Wallet<br/>Direct Payment]
+        G[🏢 Platform Treasury<br/>Fee Collection]
+        H[🔄 Royalty System<br/>ERC2981 Standard]
+    end
+    
+    subgraph "📈 Revenue Streams"
+        I[🎯 Creator Earnings<br/>80-95% of Revenue]
+        J[⚙️ Platform Fees<br/>5-20% of Revenue]
+        K[⛽ Gas Costs<br/>Network Fees]
+    end
+    
+    %% Primary Sale Flow
+    A --> E
+    E -->|95%| F
+    E -->|5%| G
+    
+    %% Royalty Flow
+    B --> H
+    H -->|2.5%| F
+    H -->|92.5%| I
+    H -->|5%| G
+    
+    %% License Flow
+    C --> E
+    E -->|80%| F
+    E -->|20%| G
+    
+    %% Rental Flow
+    D --> E
+    E -->|85%| F
+    E -->|15%| G
+    
+    %% Fee Processing
+    F --> I
+    G --> J
+    E -.->|Variable| K
+    
+    %% Styling
+    style A fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    style B fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    style C fill:#e8f5e8,stroke:#388e3c,stroke-width:2px
+    style D fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    style F fill:#e8f5e8,stroke:#2e7d32,stroke-width:3px
+    style G fill:#ffecb3,stroke:#f57f17,stroke-width:2px
+    style I fill:#c8e6c9,stroke:#388e3c,stroke-width:3px
+    style J fill:#ffcc02,stroke:#f57c00,stroke-width:2px

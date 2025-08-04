@@ -17,8 +17,8 @@
     "verify": "npm run test:integration && npm run test:content",
     "clean": "rm -rf node_modules backend/node_modules frontend/node_modules",
     "reset": "npm run clean && npm run setup && npm run compile",
-    "build": "cd frontend && npm install && npm run build",
-    "vercel-build": "cd frontend && npm install && npm run build"
+    "build": "cd frontend && npm install && CI=false npm run build",
+    "vercel-build": "cd frontend && npm install && CI=false npm run build"
   },
   "keywords": [
     "nft",

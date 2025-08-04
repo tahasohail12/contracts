@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { ethers } from 'ethers';
 import toast from 'react-hot-toast';
 
@@ -117,6 +117,51 @@ export const Web3Provider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   }, [signer, chainId]);
 
+  const handleAccountsChanged = useCallback((accounts: string[]) => {
+    if (accounts.length === 0) {
+      disconnectWallet();
+    } else {
+      setAccount(accounts[0]);
+      // Refresh balance
+      if (provider) {
+        provider.getBalance(accounts[0]).then(balance => {
+          setBalance(ethers.formatEther(balance));
+        });
+      }
+    }
+  }, [provider]);
+
+  const handleChainChanged = useCallback((chainId: string) => {
+    setChainId(parseInt(chainId, 16));
+    // Refresh the page to reset the dapp state
+    window.location.reload();
+  }, []);
+
+  const checkConnection = useCallback(async () => {
+    if (window.ethereum) {
+      try {
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const accounts = await provider.listAccounts();
+        if (accounts.length > 0) {
+          setAccount(accounts[0].address);
+          setProvider(provider);
+          
+          const signer = await provider.getSigner();
+          setSigner(signer);
+          
+          const balance = await provider.getBalance(accounts[0].address);
+          setBalance(ethers.formatEther(balance));
+          
+          const network = await provider.getNetwork();
+          setChainId(Number(network.chainId));
+          setIsConnected(true);
+        }
+      } catch (error) {
+        console.error('Error checking connection:', error);
+      }
+    }
+  }, []);
+
   // Check if wallet is already connected on page load
   useEffect(() => {
     checkConnection();
@@ -131,13 +176,7 @@ export const Web3Provider: React.FC<{ children: ReactNode }> = ({ children }) =>
         window.ethereum.removeListener('chainChanged', handleChainChanged);
       };
     }
-  }, []);
-
-  const checkConnection = async () => {
-    if (window.ethereum) {
-      try {
-        const provider = new ethers.BrowserProvider(window.ethereum);
-        const accounts = await provider.listAccounts();
+  }, [checkConnection, handleAccountsChanged, handleChainChanged]);
         
         if (accounts.length > 0) {
           const signer = await provider.getSigner();
@@ -155,27 +194,21 @@ export const Web3Provider: React.FC<{ children: ReactNode }> = ({ children }) =>
         console.error('Error checking connection:', error);
       }
     }
-  };
+  }, []);
 
-  const handleAccountsChanged = (accounts: string[]) => {
-    if (accounts.length === 0) {
-      disconnectWallet();
-    } else {
-      setAccount(accounts[0]);
-      // Refresh balance
-      if (provider) {
-        provider.getBalance(accounts[0]).then(balance => {
-          setBalance(ethers.formatEther(balance));
-        });
-      }
-    }
-  };
-
-  const handleChainChanged = (chainId: string) => {
-    setChainId(parseInt(chainId, 16));
-    // Refresh the page to reset the dapp state
-    window.location.reload();
-  };
+  const disconnectWallet = useCallback(() => {
+    setProvider(null);
+    setSigner(null);
+    setAccount(null);
+    setChainId(null);
+    setBalance('0');
+    setIsConnected(false);
+    setContracts({
+      mediaRegistry: null,
+      nftMinting: null,
+      licenseManager: null,
+    });
+  }, []);
 
   const connectWallet = async () => {
     if (!window.ethereum) {

@@ -1,0 +1,42 @@
+sequenceDiagram
+    participant U as 👤 User
+    participant F as 💻 Frontend
+    participant B as 🖥️ Backend
+    participant W as 🦊 MetaMask
+    participant BC as ⛓️ Blockchain
+    participant DB as 🗄️ Database
+    
+    Note over U,DB: NFT Minting Flow
+    
+    U->>F: 🎨 Click "Mint NFT"
+    F->>B: 🔍 Validate Content Exists
+    B->>DB: 📊 Check Content Registration
+    DB-->>B: ✅ Content Found
+    B-->>F: ✅ Validation Success
+    
+    F->>W: 🔗 Request Wallet Connection
+    W-->>F: 🔑 Wallet Connected
+    
+    F->>W: 📝 Request Transaction Signature<br/>mintContentNFT()
+    W->>U: 💰 Confirm Transaction<br/>(Gas Fee Estimate)
+    U-->>W: ✅ Approve Transaction
+    
+    W->>BC: 📤 Submit Transaction
+    BC->>BC: ⛓️ Process Transaction<br/>• Verify Content Hash<br/>• Mint ERC721 Token<br/>• Set Royalties<br/>• Update State
+    
+    BC-->>W: 📄 Transaction Receipt<br/>(Token ID, Gas Used)
+    W-->>F: 🎉 Transaction Success
+    
+    BC->>BC: 📡 Emit ContentNFTMinted Event
+    F->>B: 🔄 Listen for Event
+    B->>DB: 💾 Update Media Record<br/>(Set nftTokenId)
+    
+    F->>F: 🔄 Update UI State
+    F-->>U: 🎉 NFT Minted Successfully<br/>Token ID: #123
+    
+    Note over U,DB: Error Handling
+    
+    BC-->>W: ❌ Transaction Failed
+    W-->>F: ⚠️ Error Details
+    F->>F: 🔄 Parse Error Message
+    F-->>U: ❌ User-Friendly Error<br/>+ Retry Option

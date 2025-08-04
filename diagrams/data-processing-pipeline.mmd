@@ -1,0 +1,47 @@
+flowchart TD
+    A[📁 File Upload Request] --> B{📏 File Validation}
+    B -->|✅ Pass| C[🔐 Generate SHA256 Hash]
+    B -->|❌ Size > 50MB| Z1[❌ File Too Large Error]
+    B -->|❌ Invalid Type| Z2[❌ Invalid File Type Error]
+    
+    C --> D[📋 Extract Metadata<br/>• MIME Type<br/>• File Size<br/>• EXIF Data]
+    D --> E[🔍 Check Duplicates]
+    E -->|✅ Unique| F[🌐 Upload to IPFS]
+    E -->|❌ Exists| Z3[❌ Duplicate File Error]
+    
+    F --> G{🌐 IPFS Success?}
+    G -->|✅ Yes| H[📝 Get IPFS Hash CID]
+    G -->|❌ No| Y1[🔄 Retry Different Node]
+    Y1 --> F
+    
+    H --> I[💾 Save to MongoDB<br/>• Content Hash<br/>• IPFS Hash<br/>• Metadata<br/>• Timestamps]
+    I --> J{🗄️ Database Success?}
+    J -->|✅ Yes| K[⛓️ Register on Blockchain]
+    J -->|❌ No| Y2[🔄 Retry Database Operation]
+    Y2 --> I
+    
+    K --> L[📝 Call registerMedia Smart Contract]
+    L --> M{⛓️ Transaction Success?}
+    M -->|✅ Yes| N[📡 Listen for Events]
+    M -->|❌ Gas Failed| Y3[⚡ Adjust Gas & Retry]
+    M -->|❌ Network Error| Y4[🌐 Switch RPC & Retry]
+    Y3 --> L
+    Y4 --> L
+    
+    N --> O[✅ Success Response<br/>• File Hash<br/>• IPFS Hash<br/>• Transaction Hash<br/>• Block Number]
+    
+    %% Error Paths
+    Z1 --> P[💡 Suggest File Compression]
+    Z2 --> Q[📋 Show Supported Formats]
+    Z3 --> R[🔗 Link to Existing Content]
+    
+    %% Styling
+    style A fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    style C fill:#e8f5e8,stroke:#388e3c,stroke-width:2px
+    style F fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    style I fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    style K fill:#fce4ec,stroke:#c2185b,stroke-width:2px
+    style O fill:#e8f5e8,stroke:#2e7d32,stroke-width:3px
+    style Z1 fill:#ffebee,stroke:#d32f2f,stroke-width:2px
+    style Z2 fill:#ffebee,stroke:#d32f2f,stroke-width:2px
+    style Z3 fill:#ffebee,stroke:#d32f2f,stroke-width:2px
