@@ -1,0 +1,178 @@
+classDiagram
+    %% NFT Content Authentication Platform - UML Class Diagram
+    
+    class ERC721 {
+        <<OpenZeppelin>>
+        +balanceOf(owner) uint256
+        +ownerOf(tokenId) address
+        +transferFrom(from, to, tokenId)
+        +approve(to, tokenId)
+        +setApprovalForAll(operator, approved)
+    }
+    
+    class ERC20 {
+        <<OpenZeppelin>>
+        +totalSupply() uint256
+        +balanceOf(account) uint256
+        +transfer(to, amount) bool
+        +allowance(owner, spender) uint256
+        +approve(spender, amount) bool
+        +transferFrom(from, to, amount) bool
+    }
+    
+    class Ownable {
+        <<OpenZeppelin>>
+        -address _owner
+        +owner() address
+        +renounceOwnership()
+        +transferOwnership(newOwner)
+        #_transferOwnership(newOwner)
+    }
+    
+    class ReentrancyGuard {
+        <<OpenZeppelin>>
+        -uint256 _status
+        #nonReentrant()
+    }
+    
+    class ERC2981 {
+        <<OpenZeppelin>>
+        +royaltyInfo(tokenId, salePrice) (address, uint256)
+        #_setDefaultRoyalty(receiver, feeNumerator)
+        #_setTokenRoyalty(tokenId, receiver, feeNumerator)
+    }
+    
+    class MediaNFTMarketplace {
+        +struct ListingInfo
+        +struct RentalInfo
+        +mapping listings
+        +mapping rentals
+        +uint256 platformFeePercentage
+        +address feeRecipient
+        +mintNFT(to, tokenURI, royaltyRecipient, royaltyPercentage) uint256
+        +listForSale(tokenId, price, royaltyPercentage)
+        +buyNFT(tokenId) payable
+        +listForRent(tokenId, pricePerHour, maxDuration)
+        +rentNFT(tokenId, duration) payable
+        +claimRoyalties()
+        +setPlatformFee(percentage)
+        -_calculateRoyalty(price, percentage) uint256
+        -_transferFunds(to, amount)
+    }
+    
+    class AdvancedLicenseManager {
+        +enum LicenseType
+        +struct License
+        +mapping userLicenses
+        +mapping contentLicenses
+        +address tokenContract
+        +purchaseLicense(contentHash, licenseType) payable
+        +purchaseLicenseWithToken(contentHash, licenseType, tokenAmount)
+        +hasValidLicense(user, contentHash, licenseType) bool
+        +getLicenseInfo(user, contentHash) License
+        +reportUsage(contentHash, usageType, duration)
+        +extendLicense(contentHash, additionalTime) payable
+        +transferLicense(contentHash, newOwner)
+        -_calculatePrice(licenseType) uint256
+        -_validateLicenseTransfer(from, to, contentHash) bool
+    }
+    
+    class ContentAuthenticator {
+        +struct ContentInfo
+        +struct ReputationScore
+        +mapping registeredContent
+        +mapping userReputations
+        +registerContent(contentHash, metadata) returns(uint256)
+        +verifyContent(contentHash) ContentInfo
+        +updateReputation(user, action, weight)
+        +getReputationScore(user) ReputationScore
+        +reportContent(contentHash, reason)
+        +resolveReport(contentHash, decision)
+        +setVerificationStandard(standard)
+        -_calculateReputationScore(user) uint256
+        -_validateContentMetadata(metadata) bool
+    }
+    
+    class MockERC20 {
+        +string name
+        +string symbol
+        +uint8 decimals
+        +mint(to, amount)
+        +burn(amount)
+        +burnFrom(account, amount)
+    }
+    
+    class MediaRegistry {
+        <<Legacy>>
+        +struct MediaFile
+        +mapping registeredMedia
+        +uint256 mediaCount
+        +registerMedia(contentHash, ipfsHash, metadata) uint256
+        +getMedia(mediaId) MediaFile
+        +verifyMedia(contentHash) bool
+        +updateMetadata(mediaId, newMetadata)
+    }
+    
+    class NFTMinting {
+        <<Legacy>>
+        +uint256 tokenIdCounter
+        +mapping tokenMetadata
+        +mintNFT(to, contentHash, metadata) uint256
+        +setTokenURI(tokenId, uri)
+        +getTokenMetadata(tokenId) string
+    }
+    
+    class LicenseManager {
+        <<Legacy>>
+        +mapping contentLicenses
+        +mapping licenseOwners
+        +grantLicense(contentId, licensee, duration)
+        +revokeLicense(contentId, licensee)
+        +checkLicense(contentId, user) bool
+    }
+    
+    %% Inheritance Relationships
+    MediaNFTMarketplace --|> ERC721
+    MediaNFTMarketplace --|> Ownable
+    MediaNFTMarketplace --|> ReentrancyGuard
+    MediaNFTMarketplace --|> ERC2981
+    
+    AdvancedLicenseManager --|> Ownable
+    AdvancedLicenseManager --|> ReentrancyGuard
+    
+    ContentAuthenticator --|> Ownable
+    
+    MockERC20 --|> ERC20
+    
+    NFTMinting --|> ERC721
+    NFTMinting --|> Ownable
+    
+    LicenseManager --|> Ownable
+    
+    %% Association Relationships
+    MediaNFTMarketplace ..> ContentAuthenticator : verifies content
+    AdvancedLicenseManager ..> MockERC20 : uses for payments
+    AdvancedLicenseManager ..> MediaNFTMarketplace : manages NFT licenses
+    ContentAuthenticator ..> MediaRegistry : validates with legacy
+    
+    %% Composition Relationships
+    MediaNFTMarketplace *-- "many" ListingInfo
+    MediaNFTMarketplace *-- "many" RentalInfo
+    AdvancedLicenseManager *-- "many" License
+    ContentAuthenticator *-- "many" ContentInfo
+    ContentAuthenticator *-- "many" ReputationScore
+    
+    %% Notes
+    note for MediaNFTMarketplace "Enhanced marketplace with\nroyalties, rentals, and\nadvanced trading features"
+    note for AdvancedLicenseManager "Supports multiple license types\nwith ETH and token payments"
+    note for ContentAuthenticator "Content verification with\nreputation scoring system"
+    note for MockERC20 "Test token for license\npayments and platform fees"
+    
+    %% Styling
+    classDef enhanced fill:#e3f2fd,stroke:#1976d2,stroke-width:3px
+    classDef legacy fill:#fafafa,stroke:#616161,stroke-width:2px
+    classDef openzeppelin fill:#ffebee,stroke:#c62828,stroke-width:2px
+    
+    class MediaNFTMarketplace,AdvancedLicenseManager,ContentAuthenticator,MockERC20 enhanced
+    class MediaRegistry,NFTMinting,LicenseManager legacy
+    class ERC721,ERC20,Ownable,ReentrancyGuard,ERC2981 openzeppelin

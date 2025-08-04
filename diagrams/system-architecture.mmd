@@ -1,0 +1,51 @@
+graph TB
+    subgraph "📱 Presentation Layer"
+        A[React Frontend<br/>- Upload UI<br/>- Gallery<br/>- Marketplace]
+        B[Web3 Provider<br/>- ethers.js<br/>- Contract Interaction]
+        C[MetaMask<br/>- Wallet<br/>- Auth<br/>- Signing]
+    end
+    
+    subgraph "🔗 API Gateway Layer"
+        D[CORS Config<br/>- Origins<br/>- Methods<br/>- Headers]
+        E[Rate Limiting<br/>- Request/min<br/>- IP Blocking]
+        F[Authentication<br/>- JWT Tokens<br/>- Wallet Auth]
+    end
+    
+    subgraph "⚙️ Application Layer"
+        G[Node.js API<br/>- Express.js<br/>- REST Routes]
+        H[Business Logic<br/>- Content Mgmt<br/>- File Upload]
+        I[Integration<br/>- IPFS Client<br/>- Web3 Client]
+    end
+    
+    subgraph "🏦 Data Layer"
+        J[MongoDB<br/>- Media Docs<br/>- Metadata<br/>- User Data]
+        K[IPFS Network<br/>- File Storage<br/>- Content Hash]
+        L[Blockchain<br/>- Smart Contracts<br/>- Transaction History]
+    end
+    
+    subgraph "🔗 Blockchain Layer"
+        M[Sepolia Testnet<br/>- Gas Layer<br/>- Consensus]
+        N[Smart Contracts<br/>- Solidity<br/>- EVM]
+        O[Infura RPC<br/>- Node Access<br/>- API Gateway]
+    end
+    
+    A --> D
+    B --> D
+    C --> D
+    D --> G
+    E --> G
+    F --> G
+    G --> H
+    H --> I
+    G --> J
+    I --> K
+    I --> L
+    L --> M
+    L --> N
+    L --> O
+    
+    style A fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    style G fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    style J fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
+    style L fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    style M fill:#fce4ec,stroke:#880e4f,stroke-width:2px

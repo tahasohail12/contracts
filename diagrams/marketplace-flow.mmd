@@ -1,0 +1,51 @@
+sequenceDiagram
+    participant S as 🏪 Seller
+    participant F as 💻 Frontend
+    participant BC as ⛓️ Smart Contract
+    participant B as 🛒 Buyer
+    participant T as 💰 Treasury
+    
+    Note over S,T: NFT Marketplace Transaction Flow
+    
+    %% Listing Phase
+    S->>F: 💰 Set Price & List NFT
+    F->>F: ✅ Validate Ownership
+    F->>BC: 📝 Call listForSale(tokenId, price)
+    BC->>BC: 🔍 Verify Owner<br/>✅ Check Not Listed<br/>💰 Validate Price > 0
+    BC->>BC: 📊 Update Listing State
+    BC-->>F: ✅ NFT Listed Successfully
+    F-->>S: 🎉 Listed on Marketplace
+    
+    %% Discovery Phase  
+    B->>F: 🔍 Browse Marketplace
+    F->>BC: 📊 Query Active Listings
+    BC-->>F: 📋 Return Available NFTs
+    F-->>B: 🖼️ Display Gallery
+    
+    %% Purchase Phase
+    B->>F: 🛒 Click "Buy NFT"
+    F->>F: 🔗 Connect Wallet
+    F->>BC: 💰 Call buyNFT(tokenId) + ETH
+    
+    BC->>BC: 💳 Process Payment<br/>• Validate Payment Amount<br/>• Calculate Fees<br/>• Transfer NFT Ownership
+    
+    %% Payment Distribution
+    BC->>S: 💰 95% to Seller
+    BC->>BC: 💰 2.5% Creator Royalty
+    BC->>T: 💰 2.5% Platform Fee
+    
+    BC->>BC: 📊 Update State<br/>• Remove Listing<br/>• Transfer Token<br/>• Emit Events
+    
+    BC-->>F: ✅ Purchase Complete
+    F-->>B: 🎉 NFT Received
+    F-->>S: 💰 Payment Received
+    
+    Note over S,T: Error Scenarios
+    
+    B->>BC: 💰 Insufficient Payment
+    BC-->>F: ❌ Payment Too Low Error
+    F-->>B: 💡 Show Required Amount
+    
+    B->>BC: 🔄 NFT Already Sold
+    BC-->>F: ❌ No Longer Available
+    F-->>B: 🔄 Refresh Listings

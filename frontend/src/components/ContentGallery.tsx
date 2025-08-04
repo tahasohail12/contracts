@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useWeb3 } from '../providers/Web3Provider';
 import { toast } from 'react-hot-toast';
 
@@ -22,7 +22,10 @@ const ContentGallery: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [verifying, setVerifying] = useState<string | null>(null);
   const [verificationResults, setVerificationResults] = useState<{[key: string]: any}>({});
+<<<<<<< HEAD
   const fileInputRef = useRef<HTMLInputElement>(null);
+=======
+>>>>>>> 033ed83af305d951831281dafcfb596d2678543c
 
   const loadContents = async () => {
     try {

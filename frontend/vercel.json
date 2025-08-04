@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "name": "nft-content-authentication-frontend",
+  "framework": "create-react-app",
+  "buildCommand": "npm run build",
+  "outputDirectory": "build",
+  "installCommand": "npm install --legacy-peer-deps",
+  "devCommand": "npm start",
+  "env": {
+    "REACT_APP_API_URL": "https://your-backend-url.railway.app",
+    "REACT_APP_NETWORK": "sepolia"
+  },
+  "build": {
+    "env": {
+      "REACT_APP_API_URL": "@api_url",
+      "REACT_APP_NETWORK": "sepolia"
+    }
+  }
+}

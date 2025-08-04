@@ -1,0 +1,42 @@
+sequenceDiagram
+    participant U as 👤 User
+    participant F as 💻 React Frontend
+    participant B as 🖥️ Backend API
+    participant I as 🌐 IPFS Network
+    participant DB as 🗄️ MongoDB
+    participant BC as ⛓️ Blockchain
+    participant W as 🦊 MetaMask
+    
+    Note over U,W: Content Upload & Authentication Flow
+    
+    U->>F: 📁 Select & Upload File
+    F->>F: ✅ Validate File<br/>(Size: 50MB, Type, Malware)
+    
+    F->>B: 📤 POST /api/media/upload<br/>(FormData)
+    B->>B: 🔐 Generate SHA256 Hash
+    B->>B: 📋 Extract Metadata
+    B->>B: 🔍 Check Duplicates
+    
+    B->>I: ⬆️ Upload to IPFS
+    I-->>B: 📝 Return IPFS Hash (CID)
+    
+    B->>DB: 💾 Save Media Document<br/>(Hash, Metadata, IPFS Hash)
+    DB-->>B: ✅ Document Saved
+    
+    B->>BC: 📝 Call registerMedia()
+    BC-->>B: 📄 Transaction Receipt
+    
+    B-->>F: 🎉 Success Response<br/>(Hash, IPFS Hash, TX Hash)
+    F-->>U: ✅ Upload Complete
+    
+    Note over U,BC: Verification Flow
+    
+    U->>F: 🔍 Upload File for Verification
+    F->>B: 📤 POST /api/media/verify
+    B->>B: 🔐 Generate File Hash
+    B->>DB: 🔍 Query by Hash
+    DB-->>B: 📊 Match Result
+    B->>BC: 🔍 Verify on Blockchain
+    BC-->>B: ✅ Verification Status
+    B-->>F: 📋 Verification Report
+    F-->>U: 📊 Authenticity Result

@@ -1,6 +1,7 @@
 {
   "name": "nft-content-authentication-platform",
   "version": "1.0.0",
+<<<<<<< HEAD
   "description": "A decentralized platform for authenticating and managing digital content using blockchain technology, IPFS storage, and NFT minting capabilities.",
   "main": "server.js",
   "scripts": {
@@ -13,10 +14,31 @@
     "setup": "npm install && npm run install-frontend",
     "compile": "hardhat compile",
     "deploy": "hardhat run scripts/deploy.js --network sepolia"
+=======
+  "description": "Complete NFT Content Authentication Platform with blockchain integration",
+  "main": "integration-test.js",
+  "scripts": {
+    "setup": "npm install && cd backend && npm install && cd ../frontend && npm install && cd ..",
+    "compile": "npx hardhat compile",
+    "test": "npx hardhat test",
+    "test:integration": "node integration-test.js",
+    "test:content": "node test-content-functionality.js",
+    "start:backend": "cd backend && npm start",
+    "start:frontend": "cd frontend && npm start",
+    "start:dev": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
+    "deploy:sepolia": "npx hardhat run scripts/deploy.js --network sepolia",
+    "deploy:local": "npx hardhat run scripts/deploy.js --network localhost",
+    "verify": "npm run test:integration && npm run test:content",
+    "clean": "rm -rf node_modules backend/node_modules frontend/node_modules",
+    "reset": "npm run clean && npm run setup && npm run compile",
+    "build": "cd frontend && npm install && npm run build",
+    "vercel-build": "cd frontend && npm install && npm run build"
+>>>>>>> 033ed83af305d951831281dafcfb596d2678543c
   },
   "keywords": [
     "nft",
     "blockchain",
+<<<<<<< HEAD
     "ipfs", 
     "content-authentication",
     "ethereum",
@@ -38,11 +60,22 @@
     "node": ">=16.0.0",
     "npm": ">=8.0.0"
   },
+=======
+    "content-authentication",
+    "ipfs",
+    "ethereum",
+    "react",
+    "nodejs"
+  ],
+  "author": "NFT Content Authentication Platform",
+  "license": "MIT",
+>>>>>>> 033ed83af305d951831281dafcfb596d2678543c
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^2.1.0",
     "@nomicfoundation/hardhat-ethers": "^3.1.0",
     "@openzeppelin/contracts": "^5.4.0",
     "chai": "^4.5.0",
+    "concurrently": "^8.2.2",
     "ethers": "^6.15.0",
     "hardhat": "^2.26.1",
     "hardhat-gas-reporter": "^2.3.0",
@@ -50,6 +83,7 @@
   },
   "dependencies": {
     "axios": "^1.11.0",
+<<<<<<< HEAD
     "form-data": "^4.0.4",
     "express": "^4.21.0",
     "mongoose": "^8.7.3",
@@ -59,4 +93,20 @@
     "@helia/unixfs": "^4.0.1",
     "helia": "^5.1.0"
   }
+=======
+    "form-data": "^4.0.4"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tahasohail12/contracts.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tahasohail12/contracts/issues"
+  },
+  "homepage": "https://github.com/tahasohail12/contracts#readme"
+>>>>>>> 033ed83af305d951831281dafcfb596d2678543c
 }
