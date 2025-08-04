@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useWeb3 } from '../providers/Web3Provider';
 import { toast } from 'react-hot-toast';
 
@@ -23,7 +23,7 @@ const ContentGallery: React.FC = () => {
   const [verifying, setVerifying] = useState<string | null>(null);
   const [verificationResults, setVerificationResults] = useState<{[key: string]: any}>({});
 
-  const loadContents = useCallback(async () => {
+  const loadContents = async () => {
     try {
       const data = await getContentList();
       setContents(data);
@@ -33,11 +33,11 @@ const ContentGallery: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [getContentList]);
+  };
 
   useEffect(() => {
     loadContents();
-  }, [loadContents]);
+  }, []);
 
   const handleVerifyFile = async (contentId: string) => {
     const fileInput = document.createElement('input');
