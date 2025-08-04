@@ -21,7 +21,208 @@ A blockchain-based platform for content authentication using NFTs, with smart co
 1. Clone the repository:
 ```bash
 git clone <repository-url>
-cd contracts
+# NFT Content Authentication Platform
+
+A decentralized platform for authenticating and managing digital content using blockchain technology, IPFS storage, and NFT minting capabilities.
+
+## Features
+
+- **Content Authentication**: SHA-256 hashing for content integrity verification
+- **IPFS Storage**: Decentralized file storage using IPFS
+- **Blockchain Verification**: Content registration and verification on Ethereum Sepolia testnet
+- **NFT Minting**: Convert authenticated content into NFTs
+- **License Management**: Smart contract-based licensing system
+- **Web3 Integration**: MetaMask wallet connection and interaction
+
+## Technology Stack
+
+### Backend
+- **Node.js** with Express.js
+- **MongoDB Atlas** for metadata storage
+- **IPFS (Helia)** for decentralized file storage
+- **Ethers.js** for blockchain interaction
+- **Smart Contracts** deployed on Sepolia testnet
+
+### Frontend
+- **React 19** with TypeScript
+- **Ethers.js** for Web3 integration
+- **React Hot Toast** for notifications
+- **Responsive design** with modern CSS
+
+### Smart Contracts
+- **Media Registry**: Content registration and verification
+- **NFT Minting**: ERC-721 token creation for content ownership
+- **License Manager**: Decentralized licensing system
+
+## Deployed Smart Contracts (Sepolia Testnet)
+
+- **Media Registry**: `0xa623Fd4E5Ac8dBA6bE35AcB83d955996f5Af0ac1`
+- **NFT Minting**: `0x066DCbe3D1925E77899CA8c00075b2ec26A5B55E`
+- **License Manager**: `0x2A9296ea885e84AcCD1b3af984C433424Da02FdB`
+
+## Setup Instructions
+
+### Prerequisites
+- Node.js (v16 or higher)
+- MetaMask browser extension
+- MongoDB Atlas account
+- Sepolia testnet ETH for transactions
+
+### Backend Setup
+
+1. Install dependencies:
+```bash
+npm install
+```
+
+2. Configure environment variables:
+Create a `.env` file with:
+```
+MONGODB_URI=mongodb+srv://your-username:your-password@cluster0.mongodb.net/nft-content-auth
+PORT=3000
+```
+
+3. Start the backend server:
+```bash
+node server.js
+```
+
+The backend will run on `http://localhost:3000`
+
+### Frontend Setup
+
+1. Navigate to frontend directory:
+```bash
+cd frontend
+```
+
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Start the development server:
+```bash
+npm start
+```
+
+The frontend will run on `http://localhost:3001`
+
+## Usage
+
+### Uploading Content
+
+1. **Connect Wallet**: Click "Connect Wallet" and connect your MetaMask
+2. **Switch Network**: Ensure you're on Sepolia testnet
+3. **Upload File**: Select a file (images, videos, audio, PDFs, text files up to 50MB)
+4. **Add Metadata**: Provide title and description
+5. **Register Content**: Click "Upload & Register Content" to store on IPFS and register on blockchain
+
+### Verifying Content
+
+1. **View Gallery**: Browse uploaded content in the gallery
+2. **Verify File**: Click "Verify File" on any content item
+3. **Select File**: Choose the file you want to verify
+4. **Check Results**: System will compare hashes and show verification status
+
+### Content Display
+
+Each content item shows:
+- **Content Hash**: SHA-256 hash for integrity verification
+- **IPFS Hash**: IPFS CID for decentralized storage access
+- **Owner Address**: Ethereum address of the content owner
+- **Upload Date**: Timestamp of content registration
+- **Verification Status**: Whether content has been verified
+
+## API Endpoints
+
+### Content Management
+- `GET /api/media` - Retrieve all registered content
+- `POST /api/upload` - Upload and register new content
+- `POST /api/verify` - Verify content authenticity
+
+### Health Check
+- `GET /api/health` - Check server status
+
+## Smart Contract Functions
+
+### Media Registry
+- `registerContent(hash, ipfsHash, metadata)` - Register new content
+- `verifyContent(hash)` - Verify content exists
+- `getContent(hash)` - Retrieve content details
+
+### NFT Minting
+- `mintNFT(to, contentHash, tokenURI)` - Mint NFT for content
+- `tokenExists(tokenId)` - Check if token exists
+
+### License Manager
+- `createLicense(contentHash, licenseType, terms)` - Create content license
+- `transferLicense(tokenId, to)` - Transfer license ownership
+
+## Security Features
+
+- **Content Integrity**: SHA-256 hashing prevents tampering
+- **Decentralized Storage**: IPFS ensures content availability
+- **Blockchain Verification**: Immutable record on Ethereum
+- **Wallet Security**: MetaMask integration for secure transactions
+- **Access Control**: Owner-based permissions for content management
+
+## Development
+
+### Running Tests
+```bash
+npm test
+```
+
+### Building for Production
+```bash
+cd frontend
+npm run build
+```
+
+### Deployment Considerations
+- Set up environment variables for production
+- Configure MongoDB Atlas for production use
+- Ensure smart contracts are deployed on appropriate network
+- Set up IPFS node or use IPFS service providers
+
+## Troubleshooting
+
+### Common Issues
+
+1. **MetaMask Connection Issues**
+   - Ensure MetaMask is installed and unlocked
+   - Switch to Sepolia testnet
+   - Refresh the page and try again
+
+2. **Transaction Failures**
+   - Check you have sufficient Sepolia ETH
+   - Verify smart contract addresses
+   - Check network connection
+
+3. **File Upload Issues**
+   - Verify file size is under 50MB
+   - Check supported file types
+   - Ensure backend server is running
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Support
+
+For issues and questions:
+- Create an issue on GitHub
+- Check the troubleshooting section
+- Review the smart contract documentation
 ```
 
 2. Install dependencies:

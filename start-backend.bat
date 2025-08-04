@@ -1,0 +1,6 @@
+@echo off
+echo Starting NFT Content Authentication Platform Backend...
+echo.
+cd backend
+echo Starting Node.js server...
+node server.js

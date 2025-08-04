@@ -24,10 +24,6 @@ const ContentGallery: React.FC = () => {
   const [verificationResults, setVerificationResults] = useState<{[key: string]: any}>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    loadContents();
-  }, []);
-
   const loadContents = async () => {
     try {
       const data = await getContentList();
@@ -39,6 +35,10 @@ const ContentGallery: React.FC = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    loadContents();
+  }, []);
 
   const handleVerifyFile = async (contentId: string) => {
     const fileInput = document.createElement('input');
