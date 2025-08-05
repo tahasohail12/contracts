@@ -19,6 +19,12 @@ const corsOptions = {
             'http://localhost:3000'
         ];
         
+        // Allow all Vercel preview URLs (they contain vercel.app)
+        if (origin && origin.includes('vercel.app')) {
+            console.log('Allowing Vercel origin:', origin);
+            return callback(null, true);
+        }
+        
         if (allowedOrigins.indexOf(origin) !== -1) {
             callback(null, true);
         } else {
@@ -54,13 +60,21 @@ async function connectToDatabase() {
 
     const mongoUri = process.env.MONGODB_URI || 'mongodb+srv://tahasohail28:FqxKWf9EDPj9L9zv@cluster0.wg8afro.mongodb.net/nft-content-auth';
     
-    const connection = await mongoose.connect(mongoUri, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-    });
-
-    cachedDb = connection;
-    return connection;
+    console.log('Environment check:');
+    console.log('- NODE_ENV:', process.env.NODE_ENV);
+    console.log('- MONGODB_URI exists:', !!process.env.MONGODB_URI);
+    console.log('- Using URI:', mongoUri.replace(/:[^:@]*@/, ':****@'));
+    
+    try {
+        console.log('Connecting to MongoDB Atlas...');
+        const connection = await mongoose.connect(mongoUri);
+        cachedDb = connection;
+        console.log('✅ Connected to database:', mongoose.connection.db.databaseName);
+        return connection;
+    } catch (error) {
+        console.error('❌ MongoDB connection failed:', error.message);
+        throw error;
+    }
 }
 
 // Database Models
