@@ -73,10 +73,47 @@ const MediaSchema = new mongoose.Schema({
     metadata: Object,
     nftTokenId: Number,
     owner: String,
-    createdAt: { type: Date, default: Date.now }
+    createdAt: { type: Date, default: Date.now },
+    // NFT History tracking
+    mintedAt: Date,
+    currentOwner: String,
+    previousOwners: [String],
+    transferHistory: [{
+        from: String,
+        to: String,
+        timestamp: Date,
+        transactionHash: String,
+        blockNumber: Number
+    }],
+    verificationHistory: [{
+        verifiedBy: String,
+        timestamp: Date,
+        result: String,
+        ipAddress: String
+    }],
+    downloadHistory: [{
+        downloadedBy: String,
+        timestamp: Date,
+        ipAddress: String
+    }]
 });
 
 const Media = mongoose.models.Media || mongoose.model('Media', MediaSchema);
+
+// NFT Transaction History Schema
+const NFTHistorySchema = new mongoose.Schema({
+    tokenId: Number,
+    contentHash: String,
+    eventType: { type: String, enum: ['mint', 'transfer', 'verify', 'download'] },
+    from: String,
+    to: String,
+    timestamp: { type: Date, default: Date.now },
+    transactionHash: String,
+    blockNumber: Number,
+    metadata: Object
+});
+
+const NFTHistory = mongoose.models.NFTHistory || mongoose.model('NFTHistory', NFTHistorySchema);
 
 // Simple IPFS hash generator (mock for serverless)
 function generateIPFSHash(buffer) {
@@ -139,17 +176,40 @@ app.post('/api/media/upload', upload.single('file'), async (req, res) => {
             uploadedAt: new Date().toISOString()
         };
 
-        // Save to database
+        // Save to database with enhanced history tracking
         const mediaRecord = new Media({
             hash: contentHash,
             originalName: req.file.originalname,
             mimeType: req.file.mimetype,
             size: req.file.size,
             ipfsHash: ipfsHash,
-            metadata: metadata
+            metadata: metadata,
+            mintedAt: new Date(),
+            currentOwner: 'anonymous', // Will be updated when wallet is connected
+            previousOwners: [],
+            transferHistory: [],
+            verificationHistory: [],
+            downloadHistory: []
         });
 
         await mediaRecord.save();
+
+        // Create initial NFT history entry
+        const historyEntry = new NFTHistory({
+            tokenId: null, // Will be updated when minted on blockchain
+            contentHash: contentHash,
+            eventType: 'mint',
+            from: null,
+            to: 'anonymous',
+            timestamp: new Date(),
+            metadata: {
+                action: 'content_uploaded',
+                fileName: req.file.originalname,
+                fileSize: req.file.size
+            }
+        });
+
+        await historyEntry.save();
         console.log('Media saved:', contentHash);
 
         res.json({
@@ -186,11 +246,38 @@ app.post('/api/media/verify', upload.single('file'), async (req, res) => {
         const mediaRecord = await Media.findOne({ hash: fileHash });
         
         if (mediaRecord) {
+            // Record verification in history
+            const verificationEntry = {
+                verifiedBy: 'anonymous',
+                timestamp: new Date(),
+                result: 'verified',
+                ipAddress: req.ip || 'unknown'
+            };
+
+            mediaRecord.verificationHistory.push(verificationEntry);
+            await mediaRecord.save();
+
+            // Create history entry
+            const historyEntry = new NFTHistory({
+                tokenId: mediaRecord.nftTokenId,
+                contentHash: fileHash,
+                eventType: 'verify',
+                to: 'anonymous',
+                timestamp: new Date(),
+                metadata: {
+                    action: 'content_verified',
+                    fileName: req.file.originalname
+                }
+            });
+
+            await historyEntry.save();
+
             res.json({
                 verified: true,
                 originalUpload: mediaRecord.createdAt,
                 metadata: mediaRecord.metadata,
                 ipfsHash: mediaRecord.ipfsHash,
+                verificationHistory: mediaRecord.verificationHistory,
                 message: 'Content authenticity verified - this file was previously uploaded and registered'
             });
         } else {
@@ -205,6 +292,161 @@ app.post('/api/media/verify', upload.single('file'), async (req, res) => {
         res.status(500).json({ 
             verified: false, 
             error: 'Verification failed',
+            details: error.message 
+        });
+    }
+});
+
+// Get NFT history for a specific content hash
+app.get('/api/nft/history/:hash', async (req, res) => {
+    try {
+        await connectToDatabase();
+        
+        const contentHash = req.params.hash;
+        
+        // Get media record
+        const mediaRecord = await Media.findOne({ hash: contentHash });
+        if (!mediaRecord) {
+            return res.status(404).json({ error: 'Content not found' });
+        }
+
+        // Get full history from NFTHistory collection
+        const history = await NFTHistory.find({ contentHash }).sort({ timestamp: -1 });
+
+        res.json({
+            contentInfo: {
+                hash: mediaRecord.hash,
+                originalName: mediaRecord.originalName,
+                ipfsHash: mediaRecord.ipfsHash,
+                mintedAt: mediaRecord.mintedAt,
+                currentOwner: mediaRecord.currentOwner,
+                totalVerifications: mediaRecord.verificationHistory.length,
+                totalDownloads: mediaRecord.downloadHistory.length
+            },
+            transferHistory: mediaRecord.transferHistory,
+            verificationHistory: mediaRecord.verificationHistory,
+            downloadHistory: mediaRecord.downloadHistory,
+            fullHistory: history
+        });
+
+    } catch (error) {
+        console.error('Error fetching NFT history:', error);
+        res.status(500).json({ 
+            error: 'Failed to fetch NFT history',
+            details: error.message 
+        });
+    }
+});
+
+// Get all NFT activities (recent history across all NFTs)
+app.get('/api/nft/activities', async (req, res) => {
+    try {
+        await connectToDatabase();
+        
+        const limit = parseInt(req.query.limit) || 50;
+        const activities = await NFTHistory.find().sort({ timestamp: -1 }).limit(limit);
+
+        res.json({
+            activities,
+            total: activities.length
+        });
+
+    } catch (error) {
+        console.error('Error fetching NFT activities:', error);
+        res.status(500).json({ 
+            error: 'Failed to fetch NFT activities',
+            details: error.message 
+        });
+    }
+});
+
+// Record NFT transfer (for when wallet integration is added)
+app.post('/api/nft/transfer', async (req, res) => {
+    try {
+        await connectToDatabase();
+        
+        const { contentHash, fromAddress, toAddress, transactionHash, blockNumber } = req.body;
+
+        const mediaRecord = await Media.findOne({ hash: contentHash });
+        if (!mediaRecord) {
+            return res.status(404).json({ error: 'Content not found' });
+        }
+
+        // Update ownership
+        if (mediaRecord.currentOwner !== fromAddress) {
+            mediaRecord.previousOwners.push(mediaRecord.currentOwner);
+        }
+        mediaRecord.currentOwner = toAddress;
+
+        // Add to transfer history
+        const transferEntry = {
+            from: fromAddress,
+            to: toAddress,
+            timestamp: new Date(),
+            transactionHash,
+            blockNumber
+        };
+        mediaRecord.transferHistory.push(transferEntry);
+
+        await mediaRecord.save();
+
+        // Create history entry
+        const historyEntry = new NFTHistory({
+            tokenId: mediaRecord.nftTokenId,
+            contentHash,
+            eventType: 'transfer',
+            from: fromAddress,
+            to: toAddress,
+            timestamp: new Date(),
+            transactionHash,
+            blockNumber,
+            metadata: {
+                action: 'ownership_transferred'
+            }
+        });
+
+        await historyEntry.save();
+
+        res.json({
+            success: true,
+            message: 'Transfer recorded successfully',
+            newOwner: toAddress
+        });
+
+    } catch (error) {
+        console.error('Error recording transfer:', error);
+        res.status(500).json({ 
+            success: false,
+            error: 'Failed to record transfer',
+            details: error.message 
+        });
+    }
+});
+
+// Get ownership statistics
+app.get('/api/nft/stats', async (req, res) => {
+    try {
+        await connectToDatabase();
+        
+        const totalContent = await Media.countDocuments();
+        const totalVerifications = await NFTHistory.countDocuments({ eventType: 'verify' });
+        const totalTransfers = await NFTHistory.countDocuments({ eventType: 'transfer' });
+        const totalDownloads = await NFTHistory.countDocuments({ eventType: 'download' });
+
+        res.json({
+            overview: {
+                totalContent,
+                totalVerifications,
+                totalTransfers,
+                totalDownloads,
+                totalActivities: totalVerifications + totalTransfers + totalDownloads
+            }
+        });
+
+    } catch (error) {
+        console.error('Error fetching stats:', error);
+        res.status(500).json({ 
+            error: 'Failed to fetch statistics',
             details: error.message 
         });
     }

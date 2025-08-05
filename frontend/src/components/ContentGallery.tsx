@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useWeb3 } from '../providers/Web3Provider';
 import { toast } from 'react-hot-toast';
+import NFTHistory from './NFTHistory';
 
 interface ContentItem {
   _id: string;
@@ -22,6 +23,7 @@ const ContentGallery: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [verifying, setVerifying] = useState<string | null>(null);
   const [verificationResults, setVerificationResults] = useState<{[key: string]: any}>({});
+  const [selectedHistoryHash, setSelectedHistoryHash] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const loadContents = async () => {
@@ -162,6 +164,23 @@ const ContentGallery: React.FC = () => {
                       >
                         {verifying === content._id ? 'Verifying...' : 'Verify File'}
                       </button>
+                      
+                      <button
+                        onClick={() => setSelectedHistoryHash(content.hash)}
+                        className="history-btn"
+                        style={{
+                          padding: '0.5rem 1rem',
+                          backgroundColor: '#8b5cf6',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '0.375rem',
+                          fontSize: '0.875rem',
+                          cursor: 'pointer',
+                          marginLeft: '0.5rem'
+                        }}
+                      >
+                        📊 View History
+                      </button>
                     </div>
                   </div>
 
@@ -217,6 +236,13 @@ const ContentGallery: React.FC = () => {
           </div>
         )}
       </div>
+      
+      {selectedHistoryHash && (
+        <NFTHistory 
+          contentHash={selectedHistoryHash}
+          onClose={() => setSelectedHistoryHash(null)}
+        />
+      )}
     </section>
   );
 };

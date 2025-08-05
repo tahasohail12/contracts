@@ -1,0 +1,443 @@
+.nft-history-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.nft-history-content {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border-radius: 16px;
+  padding: 0;
+  max-width: 900px;
+  width: 100%;
+  max-height: 90vh;
+  overflow: hidden;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.nft-history-header {
+  background: linear-gradient(90deg, #8b5cf6, #a855f7);
+  padding: 20px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 16px 16px 0 0;
+}
+
+.nft-history-header h2 {
+  color: white;
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.close-button {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.close-button:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+.nft-info-summary {
+  padding: 30px;
+  border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.info-card {
+  background: rgba(139, 92, 246, 0.1);
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+.info-card h3 {
+  color: #8b5cf6;
+  margin: 0 0 15px 0;
+  font-size: 1.2rem;
+}
+
+.info-card p {
+  color: #e2e8f0;
+  margin: 8px 0;
+  font-size: 0.9rem;
+}
+
+.info-card a {
+  color: #60a5fa;
+  text-decoration: none;
+}
+
+.info-card a:hover {
+  text-decoration: underline;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 15px;
+}
+
+.stat-item {
+  background: rgba(59, 130, 246, 0.1);
+  padding: 15px;
+  border-radius: 8px;
+  text-align: center;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.stat-number {
+  display: block;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #3b82f6;
+  margin-bottom: 5px;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.history-tabs {
+  display: flex;
+  background: rgba(139, 92, 246, 0.05);
+  padding: 0 30px;
+  border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+  overflow-x: auto;
+}
+
+.tab-button {
+  background: none;
+  border: none;
+  padding: 15px 20px;
+  color: #94a3b8;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  font-size: 0.9rem;
+}
+
+.tab-button:hover {
+  color: #8b5cf6;
+}
+
+.tab-button.active {
+  color: #8b5cf6;
+  border-bottom-color: #8b5cf6;
+}
+
+.history-content {
+  padding: 30px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* Overview Tab */
+.overview-tab {
+  color: #e2e8f0;
+}
+
+.recent-activity h4 {
+  color: #8b5cf6;
+  margin-bottom: 20px;
+  font-size: 1.1rem;
+}
+
+.activity-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(139, 92, 246, 0.1);
+}
+
+.activity-icon {
+  font-size: 1.5rem;
+  margin-right: 15px;
+  width: 40px;
+  text-align: center;
+}
+
+.activity-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.activity-type {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.activity-time {
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+.activity-address {
+  font-size: 0.8rem;
+  color: #60a5fa;
+}
+
+/* Timeline Tab */
+.timeline {
+  position: relative;
+  padding-left: 30px;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 20px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, #8b5cf6, #3b82f6);
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 30px;
+  padding-left: 30px;
+}
+
+.timeline-marker {
+  position: absolute;
+  left: -30px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  border: 3px solid #1a1a2e;
+}
+
+.timeline-content {
+  background: rgba(139, 92, 246, 0.1);
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+.timeline-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.timeline-type {
+  font-weight: 600;
+  color: #8b5cf6;
+}
+
+.timeline-time {
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+.timeline-details {
+  color: #e2e8f0;
+  font-size: 0.9rem;
+}
+
+.timeline-details p {
+  margin: 5px 0;
+}
+
+.timeline-details a {
+  color: #60a5fa;
+  text-decoration: none;
+}
+
+.timeline-details a:hover {
+  text-decoration: underline;
+}
+
+/* Transfers Tab */
+.transfer-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.transfer-item {
+  background: rgba(59, 130, 246, 0.1);
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.transfer-addresses {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  color: #e2e8f0;
+  font-weight: 500;
+}
+
+.transfer-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+  color: #94a3b8;
+}
+
+.transfer-details a {
+  color: #60a5fa;
+  text-decoration: none;
+}
+
+.transfer-details a:hover {
+  text-decoration: underline;
+}
+
+/* Verifications Tab */
+.verification-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.verification-item {
+  background: rgba(34, 197, 94, 0.1);
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.verification-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.verification-result {
+  color: #22c55e;
+  font-weight: 600;
+}
+
+.verification-time {
+  font-size: 0.9rem;
+  color: #94a3b8;
+}
+
+.verification-details {
+  color: #e2e8f0;
+  font-size: 0.9rem;
+}
+
+/* No Data */
+.no-data {
+  text-align: center;
+  color: #94a3b8;
+  font-style: italic;
+  padding: 40px;
+}
+
+/* Loading and Error States */
+.loading-spinner {
+  text-align: center;
+  padding: 40px;
+  color: #8b5cf6;
+  font-size: 1.1rem;
+}
+
+.error-message {
+  text-align: center;
+  padding: 40px;
+  color: #ef4444;
+  font-size: 1.1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .nft-history-modal {
+    padding: 10px;
+  }
+  
+  .nft-info-summary {
+    padding: 20px;
+  }
+  
+  .history-content {
+    padding: 20px;
+  }
+  
+  .stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 10px;
+  }
+  
+  .timeline {
+    padding-left: 20px;
+  }
+  
+  .timeline-marker {
+    left: -20px;
+    width: 30px;
+    height: 30px;
+    font-size: 1rem;
+  }
+  
+  .transfer-addresses {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+  
+  .transfer-details {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+}
+
+/* Scrollbar Styling */
+.history-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.history-content::-webkit-scrollbar-track {
+  background: rgba(139, 92, 246, 0.1);
+  border-radius: 4px;
+}
+
+.history-content::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.5);
+  border-radius: 4px;
+}
+
+.history-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 92, 246, 0.7);
+}
