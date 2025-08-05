@@ -194,7 +194,25 @@ const UploadSection: React.FC = () => {
             <h3 style={{ color: '#10b981', marginBottom: '1rem' }}>✅ Upload Successful!</h3>
             <div style={{ fontSize: '0.875rem', lineHeight: '1.6' }}>
               <p><strong>Content Hash:</strong> {uploadResult.hash}</p>
-              <p><strong>IPFS Hash:</strong> {uploadResult.ipfsHash}</p>
+              <p>
+                <strong>IPFS Hash:</strong> 
+                {uploadResult.ipfsHash ? (
+                  <a 
+                    href={`https://ipfs.io/ipfs/${uploadResult.ipfsHash}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ 
+                      color: '#10b981', 
+                      textDecoration: 'none',
+                      marginLeft: '0.5rem'
+                    }}
+                  >
+                    {uploadResult.ipfsHash} 🔗
+                  </a>
+                ) : (
+                  ' Not available'
+                )}
+              </p>
               <p><strong>File Size:</strong> {uploadResult.size} bytes</p>
               <p><strong>Uploaded:</strong> {new Date(uploadResult.createdAt).toLocaleString()}</p>
               {uploadResult.nftTokenId && (

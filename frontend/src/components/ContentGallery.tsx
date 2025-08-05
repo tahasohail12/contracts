@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useWeb3 } from '../providers/Web3Provider';
 import { toast } from 'react-hot-toast';
 
@@ -22,10 +22,7 @@ const ContentGallery: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [verifying, setVerifying] = useState<string | null>(null);
   const [verificationResults, setVerificationResults] = useState<{[key: string]: any}>({});
-<<<<<<< HEAD
   const fileInputRef = useRef<HTMLInputElement>(null);
-=======
->>>>>>> 033ed83af305d951831281dafcfb596d2678543c
 
   const loadContents = async () => {
     try {
@@ -171,7 +168,23 @@ const ContentGallery: React.FC = () => {
                   <div className="content-hashes" style={{ marginTop: '1rem', fontSize: '0.75rem', color: '#6b7280' }}>
                     <div><strong>Hash:</strong> {content.hash.slice(0, 10)}...{content.hash.slice(-6)}</div>
                     {content.ipfsHash && (
-                      <div><strong>IPFS:</strong> {content.ipfsHash.slice(0, 10)}...{content.ipfsHash.slice(-6)}</div>
+                      <div>
+                        <strong>IPFS:</strong> 
+                        <a 
+                          href={`https://ipfs.io/ipfs/${content.ipfsHash}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{ 
+                            color: '#10b981', 
+                            textDecoration: 'none',
+                            marginLeft: '0.5rem'
+                          }}
+                          onMouseOver={(e) => (e.target as HTMLAnchorElement).style.textDecoration = 'underline'}
+                          onMouseOut={(e) => (e.target as HTMLAnchorElement).style.textDecoration = 'none'}
+                        >
+                          {content.ipfsHash.slice(0, 10)}...{content.ipfsHash.slice(-6)} 🔗
+                        </a>
+                      </div>
                     )}
                     {content.nftTokenId && (
                       <div><strong>NFT Token ID:</strong> {content.nftTokenId}</div>
