@@ -121,7 +121,8 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
 
   const getContentList = async (): Promise<any[]> => {
     try {
-      const response = await fetch('http://localhost:3000/api/media');
+      const apiUrl = process.env.NODE_ENV === 'production' ? '/api/media' : 'http://localhost:3000/api/media';
+      const response = await fetch(apiUrl);
       if (!response.ok) {
         throw new Error('Failed to fetch content list');
       }
@@ -137,7 +138,8 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
       const formData = new FormData();
       formData.append('file', file);
 
-      const response = await fetch('http://localhost:3000/api/media/verify', {
+      const apiUrl = process.env.NODE_ENV === 'production' ? '/api/media/verify' : 'http://localhost:3000/api/media/verify';
+      const response = await fetch(apiUrl, {
         method: 'POST',
         body: formData,
       });
@@ -160,7 +162,8 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
       formData.append('title', title);
       formData.append('description', description);
 
-      const response = await fetch('http://localhost:3000/api/media/upload', {
+      const apiUrl = process.env.NODE_ENV === 'production' ? '/api/media/upload' : 'http://localhost:3000/api/media/upload';
+      const response = await fetch(apiUrl, {
         method: 'POST',
         body: formData,
       });
