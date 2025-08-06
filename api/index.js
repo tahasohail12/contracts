@@ -228,9 +228,14 @@ app.post('/api/media/upload', upload.single('file'), async (req, res) => {
 
         res.json({
             success: true,
+            hash: contentHash,  // Frontend expects "hash"
             contentHash,
             ipfsHash,
+            size: req.file.size,  // Frontend expects "size"
+            createdAt: new Date().toISOString(),  // Frontend expects "createdAt"
             metadata,
+            nftTokenId: null,  // Will be set when minted
+            currentOwner: 'anonymous',
             message: 'Content uploaded and authenticated successfully'
         });
 
