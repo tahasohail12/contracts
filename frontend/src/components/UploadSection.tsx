@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useWeb3 } from '../providers/Web3Provider';
 import { toast } from 'react-hot-toast';
+import NFTMinter from './NFTMinter';
 
 const UploadSection: React.FC = () => {
   const { account, uploadContent } = useWeb3();
@@ -223,6 +224,23 @@ const UploadSection: React.FC = () => {
               </div>
             </div>
           </div>
+        )}
+
+        {uploadResult && (
+          <NFTMinter 
+            uploadedContent={{
+              hash: uploadResult.hash,
+              ipfsHash: uploadResult.ipfsHash,
+              title: uploadResult.title || title,
+              description: uploadResult.description || description,
+              size: uploadResult.size,
+              createdAt: uploadResult.createdAt
+            }}
+            onMintComplete={() => {
+              // Refresh the upload result or navigate to marketplace
+              setUploadResult(null);
+            }}
+          />
         )}
       </div>
     </section>

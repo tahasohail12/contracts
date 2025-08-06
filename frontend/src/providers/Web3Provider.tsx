@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { ethers } from 'ethers';
+import { CONTRACT_ADDRESSES, SUPPORTED_NETWORKS } from '../contracts/contractAddresses';
+import { MEDIA_NFT_MARKETPLACE_ABI, LICENSE_TYPES } from '../contracts/contractABI';
 
 interface Web3ContextType {
   provider: ethers.BrowserProvider | null;
@@ -13,6 +15,14 @@ interface Web3ContextType {
   getContentList: () => Promise<any[]>;
   verifyContent: (file: File) => Promise<any>;
   uploadContent: (file: File, title: string, description: string) => Promise<any>;
+  // Marketplace functions
+  mintContentNFT: (contentHash: string, ipfsHash: string, metadata: string, tokenURI: string, royalty: number) => Promise<any>;
+  listNFTForSale: (tokenId: number, price: string) => Promise<any>;
+  buyNFT: (tokenId: number, price: string) => Promise<any>;
+  removeFromSale: (tokenId: number) => Promise<any>;
+  grantLicense: (tokenId: number, licensee: string, licenseType: number, duration: number, price: string) => Promise<any>;
+  getMarketplaceNFTs: () => Promise<any[]>;
+  getUserNFTs: (userAddress: string) => Promise<any[]>;
 }
 
 const Web3Context = createContext<Web3ContextType | undefined>(undefined);
@@ -179,6 +189,145 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
     }
   };
 
+  // Helper function to get marketplace contract
+  const getMarketplaceContract = () => {
+    if (!provider || !signer || !chainId) {
+      throw new Error('Wallet not connected');
+    }
+    
+    const contractAddress = CONTRACT_ADDRESSES[chainId as keyof typeof CONTRACT_ADDRESSES]?.MediaNFTMarketplace;
+    if (!contractAddress) {
+      throw new Error(`Contract not deployed on network ${chainId}`);
+    }
+    
+    return new ethers.Contract(contractAddress, MEDIA_NFT_MARKETPLACE_ABI, signer);
+  };
+
+  // Marketplace functions
+  const mintContentNFT = async (contentHash: string, ipfsHash: string, metadata: string, tokenURI: string, royalty: number): Promise<any> => {
+    try {
+      if (!account) throw new Error('Wallet not connected');
+      
+      const contract = getMarketplaceContract();
+      const tx = await contract.mintContentNFT(account, contentHash, ipfsHash, metadata, tokenURI, royalty);
+      const receipt = await tx.wait();
+      
+      return { success: true, transaction: receipt, tokenId: receipt.logs[0]?.topics[1] };
+    } catch (error) {
+      console.error('Error minting NFT:', error);
+      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+    }
+  };
+
+  const listNFTForSale = async (tokenId: number, price: string): Promise<any> => {
+    try {
+      const contract = getMarketplaceContract();
+      const priceWei = ethers.parseEther(price);
+      const tx = await contract.listForSale(tokenId, priceWei);
+      const receipt = await tx.wait();
+      
+      return { success: true, transaction: receipt };
+    } catch (error) {
+      console.error('Error listing NFT:', error);
+      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+    }
+  };
+
+  const buyNFT = async (tokenId: number, price: string): Promise<any> => {
+    try {
+      const contract = getMarketplaceContract();
+      const priceWei = ethers.parseEther(price);
+      const tx = await contract.buyNFT(tokenId, { value: priceWei });
+      const receipt = await tx.wait();
+      
+      return { success: true, transaction: receipt };
+    } catch (error) {
+      console.error('Error buying NFT:', error);
+      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+    }
+  };
+
+  const removeFromSale = async (tokenId: number): Promise<any> => {
+    try {
+      const contract = getMarketplaceContract();
+      const tx = await contract.removeFromSale(tokenId);
+      const receipt = await tx.wait();
+      
+      return { success: true, transaction: receipt };
+    } catch (error) {
+      console.error('Error removing from sale:', error);
+      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+    }
+  };
+
+  const grantLicense = async (tokenId: number, licensee: string, licenseType: number, duration: number, price: string): Promise<any> => {
+    try {
+      const contract = getMarketplaceContract();
+      const priceWei = ethers.parseEther(price);
+      const tx = await contract.grantLicense(tokenId, licensee, licenseType, duration, priceWei, { value: priceWei });
+      const receipt = await tx.wait();
+      
+      return { success: true, transaction: receipt };
+    } catch (error) {
+      console.error('Error granting license:', error);
+      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+    }
+  };
+
+  const getMarketplaceNFTs = async (): Promise<any[]> => {
+    try {
+      if (!provider || !chainId) return [];
+      
+      const contractAddress = CONTRACT_ADDRESSES[chainId as keyof typeof CONTRACT_ADDRESSES]?.MediaNFTMarketplace;
+      if (!contractAddress) return [];
+      
+      const contract = new ethers.Contract(contractAddress, MEDIA_NFT_MARKETPLACE_ABI, provider);
+      
+      // This is a simplified version - in a real implementation, you'd want to query events
+      // or have a view function that returns all marketplace listings
+      const nfts: any[] = [];
+      
+      // For now, return empty array - you can implement event querying later
+      return nfts;
+    } catch (error) {
+      console.error('Error fetching marketplace NFTs:', error);
+      return [];
+    }
+  };
+
+  const getUserNFTs = async (userAddress: string): Promise<any[]> => {
+    try {
+      if (!provider || !chainId) return [];
+      
+      const contractAddress = CONTRACT_ADDRESSES[chainId as keyof typeof CONTRACT_ADDRESSES]?.MediaNFTMarketplace;
+      if (!contractAddress) return [];
+      
+      const contract = new ethers.Contract(contractAddress, MEDIA_NFT_MARKETPLACE_ABI, provider);
+      const tokenIds = await contract.getCreatorAssets(userAddress);
+      
+      const nfts = [];
+      for (const tokenId of tokenIds) {
+        try {
+          const asset = await contract.getMediaAsset(tokenId);
+          const owner = await contract.ownerOf(tokenId);
+          nfts.push({
+            tokenId: tokenId.toString(),
+            ...asset,
+            owner,
+            price: ethers.formatEther(asset.price || 0)
+          });
+        } catch (error) {
+          console.error(`Error fetching NFT ${tokenId}:`, error);
+        }
+      }
+      
+      return nfts;
+    } catch (error) {
+      console.error('Error fetching user NFTs:', error);
+      return [];
+    }
+  };
+
   const value: Web3ContextType = {
     provider,
     signer,
@@ -191,6 +340,13 @@ export const Web3Provider: React.FC<Web3ProviderProps> = ({ children }) => {
     getContentList,
     verifyContent,
     uploadContent,
+    mintContentNFT,
+    listNFTForSale,
+    buyNFT,
+    removeFromSale,
+    grantLicense,
+    getMarketplaceNFTs,
+    getUserNFTs,
   };
 
   return <Web3Context.Provider value={value}>{children}</Web3Context.Provider>;

@@ -5,6 +5,7 @@ import Header from './components/Header';
 import Hero from './components/Hero';
 import UploadSection from './components/UploadSection';
 import ContentGallery from './components/ContentGallery';
+import Marketplace from './components/Marketplace';
 import Footer from './components/Footer';
 import './styles/globals.css';
 
@@ -29,6 +30,7 @@ function App() {
           <Hero />
           <UploadSection />
           <ContentGallery />
+          <Marketplace />
         </main>
         
         <Footer />
